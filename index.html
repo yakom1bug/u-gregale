@@ -3,20 +3,30 @@
 <title>U GREGALE — Diagnostic</title><link rel="stylesheet" href="styles.css"></head>
 <body><main class="shell">
 <header><div class="brand">U GREGALE</div><div class="tagline">Dans l’air du temps.</div></header>
-<section id="intro" class="card hero">
-<span class="eyebrow">DIAGNOSTIC GRATUIT</span>
-<h1>Facturation électronique : dites-nous votre situation</h1>
-<h2>U GREGALE vous donne une feuille de route personnalisée<br><strong>EN DIRECT ET GRATUITEMENT EN MOINS DE 4 MINUTES</strong></h2>
-<p>Pas de compte. Pas d’e-mail. Pas de téléphone.</p><div class="promise"><strong>Notre règle :</strong> la fiche gratuite doit vous donner les éléments nécessaires pour traiter votre cas. Si certaines réponses restent impossibles à déterminer, nous vous proposerons une phase 2 de questions ciblées.</div>
+<section id="intro" class="card hero screen-only">
+<span class="eyebrow">U GREGALE</span>
+<h1>FACTURATION ÉLECTRONIQUE</h1>
+<h2><strong>Vous êtes concernés !</strong></h2>
+<p class="hero-lead">U GREGALE vous aide à identifier ce qui vous concerne<br class="hero-lead-break"> et les prochaines étapes à prévoir.</p>
 <div class="start-grid">
 <button id="startConcerned">🧭 Commencer mon diagnostic</button>
-<button id="startSiret" class="secondary">🏢 J’ai mon SIRET et je préfère commencer par là</button>
 </div>
-<div id="siretBox" class="hidden siret-box">
+<p class="promise-line"><strong>Sans compte · Sans e-mail · Sans téléphone</strong><br><strong>Gratuit et en moins de 4 minutes</strong></p>
+</section>
+<section id="siretChoice" class="card hidden screen-only">
+<span class="eyebrow">AVANT DE COMMENCER</span>
+<h1>Avez-vous votre SIRET ?</h1>
+<p class="small">Si vous l’avez, U GREGALE peut récupérer quelques informations publiques pour personnaliser votre diagnostic.</p>
+<div class="choice-boxes">
+<label class="choice-box"><input type="checkbox" id="hasSiretYes"><span>Oui, j’ai mon SIRET</span></label>
+<label class="choice-box"><input type="checkbox" id="hasSiretNo"><span>Non, je n’ai pas mon SIRET</span></label>
+</div>
+<div id="siretEntry" class="hidden siret-box">
 <label for="siret">Votre SIRET</label><input id="siret" inputmode="numeric" maxlength="14" placeholder="14 chiffres">
-<p class="small">Le SIRET pourra servir à préremplir des informations publiques lorsque la recherche sera activée. Aucun compte ni contact n’est créé.</p>
+<p class="small">Ces données publiques servent à personnaliser le diagnostic. Elles ne permettent pas de déduire votre régime de TVA ni vos types de clients.</p>
 <button id="siretContinue">Rechercher mon entreprise</button><div id="siretPreview" class="hidden result-box"></div><p id="siretMsg" class="small"></p>
 </div>
+<div class="nav-buttons"><button id="siretValidate" disabled>Valider et continuer →</button></div>
 </section>
 <section id="quiz" class="card hidden">
 <div class="progress"><span id="progressText"></span><div><i id="progressBar"></i></div></div>
@@ -24,5 +34,9 @@
 <div class="nav-buttons"><button id="back" class="secondary" disabled>← Retour</button><button id="next" disabled>Continuer →</button></div>
 </section>
 <section id="result" class="card hidden"></section>
-<footer><p>U GREGALE — outil d’orientation pratique. Les sources officielles font foi.</p><p>Vérification réglementaire : 13 septembre 2026.</p></footer>
-</main><script src="app.js?v=1914"></script></body></html>
+<footer>
+<p>U GREGALE — outil d’orientation pratique. Les sources officielles font foi.</p>
+<p>Vérification réglementaire : 13 septembre 2026.</p>
+<p><a href="mentions-legales.html" target="_blank" rel="noopener">Mentions légales ↗</a> · <a href="confidentialite.html" target="_blank" rel="noopener">Politique de confidentialité ↗</a></p>
+</footer>
+</main><script src="app.js?v=1923"></script></body></html>

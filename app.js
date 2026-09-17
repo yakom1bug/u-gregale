@@ -1,4 +1,7 @@
 const FICHE_DATE='13 septembre 2026';
+// V21 — correction navigation : Retour actif sur la question 1/5 et dans la précision de catégorie.
+// V21.1920 — dans la précision de catégorie, seul « Retour » reste visible avant détermination.
+
 const DATE_2026='<span class="date-highlight">DEPUIS LE 1er SEPTEMBRE 2026</span>';
 const DATE_2027='<span class="date-highlight">À COMPTER DU 1er SEPTEMBRE 2027</span>';
 const dateLabel=date=>date==='1er septembre 2026'?DATE_2026:date==='1er septembre 2027'?DATE_2027:'à préciser';
@@ -17,8 +20,7 @@ const questions=[
 ];
 let step=0,answers={},mode="main";
 const $=id=>document.getElementById(id);
-$('startSiret').onclick=()=>{$('siretBox').classList.toggle('hidden');if(!$('siretBox').classList.contains('hidden'))$('siret').focus()};
-$('startConcerned').onclick=()=>startManual();
+$('startConcerned').onclick=()=>startDiagnosticEntry();
 
 function normalizeSiret(v){return String(v||'').replace(/\s+/g,'').replace(/[-.]/g,'');}
 function isValidSiret(s){
@@ -77,13 +79,13 @@ async function lookupSiret(){
       ${!category?`<div class="siret-help"><strong>Catégorie d’entreprise non renseignée</strong><p class="small">Cette information n’est pas disponible dans les données publiques consultées. U GREGALE vous proposera de la déterminer à partir des critères officiels avant de finaliser votre fiche.</p></div><button id="useSiret" class="siret-confirm">Continuer et préciser ma catégorie →</button>`:''}`;
     preview.classList.remove('hidden');msg.textContent='';
     $('useSiret').onclick=()=>{
-      $('intro').classList.add('hidden');
+      $('siretChoice').classList.add('hidden');
       $('quiz').classList.remove('hidden');
       answers={siret:siret,siretInfo:{siret,r,e,category}};
       if(category){
         answers.size=category;
         console.log('U GREGALE — catégorie SIRET préremplie :', category, r.categorie_entreprise);
-        showPrefilledCategory(category);
+        step=1;mode='main';render();
       }else{
         // Category is absent from the public data: go directly to the helper
         // instead of making the user pass through Q1 and select "unknown".
@@ -97,7 +99,30 @@ async function lookupSiret(){
   }finally{btn.disabled=false;}
 }
 $("siretContinue").onclick=lookupSiret;
-function startManual(){mode="main";$('intro').classList.add('hidden');$('quiz').classList.remove('hidden');step=0;answers={};render()}
+function startDiagnosticEntry(){
+  $('intro').classList.add('hidden');
+  $('siretChoice').classList.remove('hidden');
+}
+function updateSiretChoice(){
+  const yes=$('hasSiretYes'), no=$('hasSiretNo'), entry=$('siretEntry'), validate=$('siretValidate');
+  if(yes.checked && no.checked){ no.checked=false; }
+  entry.classList.toggle('hidden', !yes.checked);
+  // Avec SIRET : la recherche est l'unique action utile. Le bouton
+  // « Valider et continuer » disparaît pour éviter deux boutons concurrents.
+  // Sans SIRET : le bouton reste disponible pour commencer directement le diagnostic.
+  validate.classList.toggle('hidden', yes.checked);
+  validate.disabled=!(yes.checked || no.checked);
+}
+$('hasSiretYes').onchange=()=>{ $('hasSiretNo').checked=false; updateSiretChoice(); };
+$('hasSiretNo').onchange=()=>{ $('hasSiretYes').checked=false; updateSiretChoice(); };
+$('siretValidate').onclick=()=>{
+  if($('hasSiretNo').checked){ startManual(); return; }
+  if($('hasSiretYes').checked){
+    $('siret').focus();
+    $('siretMsg').textContent='Saisissez votre SIRET puis cliquez sur « Rechercher mon entreprise ».';
+  }
+};
+function startManual(){mode="main";$('intro').classList.add('hidden');$('siretChoice').classList.add('hidden');$('quiz').classList.remove('hidden');step=0;answers={};render()}
 function currentQuestions(){return questions}
 function recapForStep(currentStep){
   const items=[];
@@ -144,7 +169,7 @@ function render(){
   const has=q.multi?Array.isArray(answers[q.id])&&answers[q.id].length>0:!!answers[q.id];
   $('next').disabled=!has;
   $('back').classList.remove('hidden');
-  $('back').disabled=step===0;
+  $('back').disabled=false;
   $('next').textContent=(step===qs.length-1 && !(q.id==='vat'&&answers.vat==='exempt'))?'Voir ma fiche':'Continuer →';
 }
 function setPrecisionNavigation(canContinue){
@@ -174,6 +199,7 @@ function showPrefilledCategory(category){
   $('next').textContent='Continuer →';
 }
 function preciseCategory(){
+  mode='categoryPrecision';
   $('quiz').classList.remove('hidden');
   $('answers').innerHTML='';
   setPrecisionNavigation(false);
@@ -187,7 +213,13 @@ function preciseCategory(){
   const catStep=$('catStep');
 
   function drawEffectif(){
-    setPrecisionNavigation(false);
+    setPrecisionNavigation(true);
+    $('next').classList.add('hidden');
+    $('back').onclick=()=>{
+      mode='main';
+      step=0;
+      render();
+    };
     catStep.innerHTML=`<div class="result-box">
       <h2>1. Combien de personnes travaillent dans votre entreprise ?</h2>
       <p class="small">Indiquez l’effectif de votre entreprise.</p>
@@ -206,7 +238,9 @@ function preciseCategory(){
   }
 
   function drawFinancials(){
-    setPrecisionNavigation(false);
+    setPrecisionNavigation(true);
+    $('next').classList.add('hidden');
+    $('back').onclick=()=>drawEffectif();
     catStep.innerHTML=`<div class="result-box">
       <h2>2. Vos chiffres annuels</h2>
       <p class="small">Indiquez une tranche pour le chiffre d’affaires et pour le total du bilan de votre dernier exercice comptable clôturé.</p>
@@ -243,6 +277,7 @@ function preciseCategory(){
     const nav=document.querySelector('.nav-buttons');
     nav.classList.remove('hidden');
     $('back').classList.add('hidden');
+    $('next').classList.remove('hidden');
     $('next').disabled=false;
     $('next').textContent='Continuer vers le questionnaire →';
     catStep.innerHTML=`<div class="result-box">
@@ -269,6 +304,7 @@ function classifyCategory(s){
   return 'large';
 }
 $('next').onclick=()=>{
+  if(mode==='categoryPrecision')return;
   if(mode==='categoryResult'){step=1;mode='main';$('back').classList.remove('hidden');render();return;}
   const qs=currentQuestions(),q=qs[step];
   if(q&&q.id==='size'&&answers.size==='unknown'){preciseCategory();return;}
@@ -276,7 +312,13 @@ $('next').onclick=()=>{
   if(step<qs.length-1){step++;render()}else showResult();
 };
 $('back').onclick=()=>{
+  if(mode==='categoryPrecision')return;
   if(mode==='categoryResult'){step=0;mode='main';$('back').classList.remove('hidden');render();return;}
+  if(step===0){
+    $('quiz').classList.add('hidden');
+    $('siretChoice').classList.remove('hidden');
+    return;
+  }
   if(step>0){step--;render()}
 };
 function hasClient(v){const c=answers.clients||[];return c.includes(v)}
@@ -435,7 +477,7 @@ function showResult(){
  if(public)officialResources.push({title:'Informations officielles sur Chorus Pro et le secteur public',href:'https://www.impots.gouv.fr/actualite/chorus-pro-restera-la-plateforme-de-reference-pour-la-facturation-electronique-du-secteur'});
  if(a.vat==='exempt')officialResources.push({title:'Informations officielles sur les opérations exonérées et la réforme',href:'https://www.impots.gouv.fr/professionnel/questions/je-nemets-pas-de-facture-ou-je-facture-sans-tva-suis-je-concerne-par-la'});
  const officialHtml=officialResources.map(r=>`<li><a href="${r.href}" target="_blank" rel="noopener">${esc(r.title)} ↗</a><div class="official-url">${esc(r.href)}</div></li>`).join('');
- blocks.push(`<div class="result-box official-box" id="officialResources"><h2>Informations officielles adaptées à votre situation</h2><p>Pour aller plus loin, vous pouvez consulter les ressources officielles suivantes :</p><ul class="official-resources">${officialHtml}</ul><p class="official-footer">Fiche à jour au ${FICHE_DATE} — Les textes et ressources de l’administration font foi.<br>U GREGALE est un outil d’orientation pratique.</p></div>`);
+ blocks.push(`<div class="result-box official-box" id="officialResources"><h2>Informations officielles adaptées à votre situation</h2><p>Pour aller plus loin, vous pouvez consulter les ressources officielles suivantes :</p><ul class="official-resources">${officialHtml}</ul><p class="official-footer">Fiche à jour au ${FICHE_DATE} — Les textes et ressources de l’administration font foi.<br>U GREGALE est un outil d’orientation pratique.<br><strong>Pour toute information : <a href="mailto:contact.ugregale@gmail.com">contact.ugregale@gmail.com</a></strong></p></div>`);
  $('result').innerHTML=`<h1>Votre feuille de route personnalisée</h1><p class="fiche-credit">Réalisée par U GREGALE</p><p class="small fiche-date"><strong>Vérification réglementaire : ${FICHE_DATE}</strong></p>${blocks.join('')}<div class="actions"><button id="pdf">⬇️ Enregistrer ma fiche en PDF</button><button class="secondary" id="print">🖨️ Imprimer ma fiche</button><button class="secondary" id="restart">Refaire le diagnostic</button></div>`;
  $('pdf').onclick=downloadPdf;$('print').onclick=()=>window.print();$('restart').onclick=restart;['phase2exempt'].forEach(id=>{const el=$(id);if(el)el.onclick=showPhase2;});
   const infoPairs=[['softwareInfo','Vigilance sur les possibilités de votre logiciel'],['eInvoicingInfo','Quelles opérations sont concernées ?']];
@@ -509,5 +551,5 @@ function downloadPdf(){
   // On utilise donc exactement le même rendu que le bouton « Imprimer ».
   window.print();
 }
-function restart(){$("result").classList.add("hidden");$("quiz").classList.add("hidden");$("intro").classList.remove("hidden");$("siretBox").classList.add("hidden");$("siret").value="";step=0;answers={};mode="main"}
+function restart(){$("result").classList.add("hidden");$("quiz").classList.add("hidden");$("siretChoice").classList.add("hidden");$("intro").classList.remove("hidden");$("siretEntry").classList.add("hidden");$("siret").value="";$('hasSiretYes').checked=false;$('hasSiretNo').checked=false;$('siretValidate').disabled=true;step=0;answers={};mode="main"}
 render();
