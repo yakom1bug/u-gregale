@@ -1,5 +1,6 @@
+const U_GREGALE_VERSION='22.0';
 const FICHE_DATE='13 septembre 2026';
-// V21 — correction navigation : Retour actif sur la question 1/5 et dans la précision de catégorie.
+// V22.0 — base V21.1927 validée, affichage discret de la version. : Retour actif sur la question 1/5 et dans la précision de catégorie.
 // V21.1920 — dans la précision de catégorie, seul « Retour » reste visible avant détermination.
 
 const DATE_2026='<span class="date-highlight">DEPUIS LE 1er SEPTEMBRE 2026</span>';
@@ -20,6 +21,8 @@ const questions=[
 ];
 let step=0,answers={},mode="main";
 const $=id=>document.getElementById(id);
+const versionEl=$('appVersion');
+if(versionEl)versionEl.textContent='v'+U_GREGALE_VERSION;
 $('startConcerned').onclick=()=>startDiagnosticEntry();
 
 function normalizeSiret(v){return String(v||'').replace(/\s+/g,'').replace(/[-.]/g,'');}
@@ -477,9 +480,9 @@ function showResult(){
  if(public)officialResources.push({title:'Informations officielles sur Chorus Pro et le secteur public',href:'https://www.impots.gouv.fr/actualite/chorus-pro-restera-la-plateforme-de-reference-pour-la-facturation-electronique-du-secteur'});
  if(a.vat==='exempt')officialResources.push({title:'Informations officielles sur les opérations exonérées et la réforme',href:'https://www.impots.gouv.fr/professionnel/questions/je-nemets-pas-de-facture-ou-je-facture-sans-tva-suis-je-concerne-par-la'});
  const officialHtml=officialResources.map(r=>`<li><a href="${r.href}" target="_blank" rel="noopener">${esc(r.title)} ↗</a><div class="official-url">${esc(r.href)}</div></li>`).join('');
- blocks.push(`<div class="result-box official-box" id="officialResources"><h2>Informations officielles adaptées à votre situation</h2><p>Pour aller plus loin, vous pouvez consulter les ressources officielles suivantes :</p><ul class="official-resources">${officialHtml}</ul><p class="official-footer">Fiche à jour au ${FICHE_DATE} — Les textes et ressources de l’administration font foi.<br>U GREGALE est un outil d’orientation pratique.<br><strong>Pour toute information : <a href="mailto:contact.ugregale@gmail.com">contact.ugregale@gmail.com</a></strong></p></div>`);
- $('result').innerHTML=`<h1>Votre feuille de route personnalisée</h1><p class="fiche-credit">Réalisée par U GREGALE</p><p class="small fiche-date"><strong>Vérification réglementaire : ${FICHE_DATE}</strong></p>${blocks.join('')}<div class="actions"><button id="pdf">⬇️ Enregistrer ma fiche en PDF</button><button class="secondary" id="print">🖨️ Imprimer ma fiche</button><button class="secondary" id="restart">Refaire le diagnostic</button></div>`;
- $('pdf').onclick=downloadPdf;$('print').onclick=()=>window.print();$('restart').onclick=restart;['phase2exempt'].forEach(id=>{const el=$(id);if(el)el.onclick=showPhase2;});
+ blocks.push(`<div class="result-box official-box" id="officialResources"><h2>Informations officielles adaptées à votre situation</h2><p>Pour aller plus loin, vous pouvez consulter les ressources officielles suivantes :</p><ul class="official-resources">${officialHtml}</ul><p class="official-footer">Fiche à jour au ${FICHE_DATE} — Les textes et ressources de l’administration font foi.<br>U GREGALE est un outil d’orientation pratique.</p></div>`);
+ $('result').innerHTML=`<h1>Votre feuille de route personnalisée</h1><p class="fiche-credit">Réalisée par U GREGALE</p><p class="small fiche-date"><strong>Vérification réglementaire : ${FICHE_DATE}</strong></p>${blocks.join('')}<div class="actions"><button id="pdf">📄 Télécharger ou imprimer ma fiche</button><button class="secondary" id="restart">Refaire le diagnostic</button></div>`;
+ $('pdf').onclick=downloadPdf;$('restart').onclick=restart;['phase2exempt'].forEach(id=>{const el=$(id);if(el)el.onclick=showPhase2;});
   const infoPairs=[['softwareInfo','Vigilance sur les possibilités de votre logiciel'],['eInvoicingInfo','Quelles opérations sont concernées ?']];
   infoPairs.forEach(([id,title])=>{
     const infoPopover=$(id);
