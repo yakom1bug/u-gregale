@@ -149,3 +149,66 @@
 .info-page .notice{padding:14px 16px;border:1px solid #d8ddda;border-radius:12px;background:#f7f8f7}
 .info-page footer{margin-top:18px}
 @media print{.info-page{max-width:none}.info-page .card{box-shadow:none}.info-page .back-link{display:none}}
+
+/* V21.1926 — confort mobile : hiérarchie, largeur et lecture plus naturelles */
+@media screen and (max-width:560px){
+  .shell{padding:16px 12px}
+  header{margin-bottom:16px;padding:0 2px}
+  .brand{font-size:.95rem}
+  .tagline{font-size:.78rem}
+
+  .card{padding:20px 16px;border-radius:18px;margin-bottom:14px}
+  .hero{padding:28px 16px}
+  .eyebrow{font-size:.72rem}
+  h1{font-size:clamp(2rem,9vw,2.55rem);line-height:1.08;margin:12px 0}
+  h2{font-size:1.08rem}
+  p{line-height:1.5}
+  .small{font-size:.88rem}
+
+  .hero-lead{font-size:.98rem;line-height:1.45;padding:12px 13px;margin-top:16px}
+  .promise-line{margin-top:18px;line-height:1.55;font-size:.92rem}
+
+  .choice-boxes{gap:10px;margin:18px 0}
+  .choice-box{padding:16px 14px;gap:12px;min-height:64px}
+  .choice-box:has(input:checked){padding:15px 13px}
+  .choice-box input{width:20px;height:20px}
+
+  .siret-box{margin-top:18px;padding:16px 14px}
+  .siret-box input,.text-input{padding:13px;font-size:1rem}
+  .siret-grid{grid-template-columns:1fr;gap:8px}
+  .siret-item{padding:10px}
+
+  .progress{margin-bottom:20px;font-size:.88rem}
+  .answers{gap:9px}
+  .answer{padding:15px 14px;line-height:1.35}
+  .answer.selected{padding:14px 13px}
+  .answer-recap{margin-bottom:16px;padding:10px 12px}
+  .answer-recap-line{font-size:.9rem;line-height:1.4}
+
+  .nav-buttons{gap:8px;margin-top:14px;flex-wrap:nowrap}
+  .nav-buttons button{flex:1 1 0;min-width:0;padding:13px 12px}
+
+  /* La justification étire énormément les mots sur petit écran. */
+  #result .result-box p,
+  #result .result-box li,
+  #result .official-url{ text-align:left; text-justify:auto }
+  #result .result-box{padding:16px 14px;margin:14px 0}
+  #result .result-box h2{font-size:1.08rem;line-height:1.35}
+  #result .result-box p,
+  #result .result-box li{line-height:1.5}
+  #result .result-box ul,
+  #result .result-box ol{padding-left:22px}
+  #result .situation-list li{padding-left:1.1rem;margin:.5rem 0}
+  #result .official-box{margin-top:18px}
+  #result .official-resources{padding-left:21px}
+  #result .official-resources li{margin-bottom:12px}
+  #result .official-url{font-size:.82rem;overflow-wrap:anywhere}
+  #result .fiche-credit{font-size:1rem}
+  #result .fiche-date{font-size:.78rem;margin-bottom:14px}
+
+  .actions{display:grid;grid-template-columns:1fr;gap:9px}
+  .actions button{width:100%;min-width:0;padding:14px 12px}
+
+  footer{font-size:.76rem;line-height:1.45;padding:8px 4px}
+  footer p{margin:8px 0}
+}
